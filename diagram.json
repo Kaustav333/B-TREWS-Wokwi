@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "author": "B-TREWS Capstone Team",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-s3-devkitc-1",
+      "id": "esp",
+      "top": 100,
+      "left": 200,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-bmp280",
+      "id": "bmp280",
+      "top": -250,
+      "left": 550,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_voc",
+      "top": -250,
+      "left": -350,
+      "attrs": { "label": "MQ-135 VOC Gas Sensor" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_ntc",
+      "top": 0,
+      "left": -350,
+      "attrs": { "label": "NTC Busbar Temp Probe" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_green",
+      "top": 430,
+      "left": -400,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_green",
+      "top": 420,
+      "left": -300,
+      "attrs": { "color": "green", "label": "STATE 0: Normal" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_amber",
+      "top": 560,
+      "left": -400,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_amber",
+      "top": 550,
+      "left": -300,
+      "attrs": { "color": "orange", "label": "STATE 1: Warning" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_red",
+      "top": 690,
+      "left": -400,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 680,
+      "left": -300,
+      "attrs": { "color": "red", "label": "STATE 2: Critical Trip" }
+    },
+    {
+      "type": "wokwi-relay",
+      "id": "relay",
+      "top": 50,
+      "left": 550,
+      "attrs": { "label": "10A Safety Disconnect Relay" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_load",
+      "top": 50,
+      "left": 720,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "load_lamp",
+      "top": 40,
+      "left": 800,
+      "attrs": { "color": "blue", "label": "Battery Pack Load" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 400,
+      "left": 580,
+      "attrs": { "label": "Alarm Buzzer" }
+    }
+  ],
+  "connections": [
+    [ "esp:GND.1", "bmp280:GND", "black", [ "v0" ] ],
+    [ "esp:3V3", "bmp280:VCC", "red", [ "v0" ] ],
+    [ "esp:4", "bmp280:SDA", "blue", [ "v0" ] ],
+    [ "esp:5", "bmp280:SCL", "yellow", [ "v0" ] ],
+
+    [ "esp:GND.1", "pot_voc:GND", "black", [ "v0" ] ],
+    [ "esp:3V3", "pot_voc:VCC", "red", [ "v0" ] ],
+    [ "esp:7", "pot_voc:SIG", "green", [ "v0" ] ],
+
+    [ "esp:GND.1", "pot_ntc:GND", "black", [ "v0" ] ],
+    [ "esp:3V3", "pot_ntc:VCC", "red", [ "v0" ] ],
+    [ "esp:8", "pot_ntc:SIG", "purple", [ "v0" ] ],
+
+    [ "esp:13", "r_green:1", "green", [ "v0" ] ],
+    [ "r_green:2", "led_green:A", "green", [ "h0" ] ],
+    [ "led_green:C", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:14", "r_amber:1", "orange", [ "v0" ] ],
+    [ "r_amber:2", "led_amber:A", "orange", [ "h0" ] ],
+    [ "led_amber:C", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:21", "r_red:1", "red", [ "v0" ] ],
+    [ "r_red:2", "led_red:A", "red", [ "h0" ] ],
+    [ "led_red:C", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:47", "buzzer:2", "purple", [ "v0" ] ],
+    [ "esp:GND.1", "buzzer:1", "black", [ "v0" ] ],
+
+    [ "esp:48", "relay:IN", "orange", [ "v0" ] ],
+    [ "esp:GND.1", "relay:GND", "black", [ "v0" ] ],
+    [ "esp:5V", "relay:VCC", "red", [ "v0" ] ],
+
+    [ "relay:NO", "r_load:1", "red", [ "h0" ] ],
+    [ "r_load:2", "load_lamp:A", "red", [ "h0" ] ],
+    [ "esp:3V3", "relay:COM", "red", [ "v0" ] ],
+    [ "load_lamp:C", "esp:GND.1", "black", [ "v0" ] ]
+  ]
+}
