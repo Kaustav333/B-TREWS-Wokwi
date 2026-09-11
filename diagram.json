@@ -151,7 +151,7 @@
 
     [ "esp:48", "relay:IN", "orange", [ "v0" ] ],
     [ "esp:GND.1", "relay:GND", "black", [ "v0" ] ],
-    [ "esp:5V", "relay:VCC", "red", [ "v0" ] ],
+    [ "esp:3V3", "relay:VCC", "red", [ "v0" ] ],
 
     [ "relay:NO", "r_load:1", "red", [ "h0" ] ],
     [ "r_load:2", "load_lamp:A", "red", [ "h0" ] ],

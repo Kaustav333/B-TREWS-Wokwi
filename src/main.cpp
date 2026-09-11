@@ -207,13 +207,18 @@ void loop() {
       break;
 
     case STATE_CRITICAL:
-      digitalWrite(PIN_RELAY,      LOW);
+      digitalWrite(PIN_RELAY,      LOW); // OPEN Relay -> Disconnect Battery Load
       digitalWrite(PIN_LED_GREEN,  LOW);
       digitalWrite(PIN_LED_YELLOW, LOW);
       digitalWrite(PIN_LED_AMBER,  LOW);
       digitalWrite(PIN_LED_RED,    HIGH);
       digitalWrite(PIN_BUZZER,     HIGH);
       Serial.printf("[t=%5.0fs] STATE 3 CRITICAL | dP/dt: %6.3f hPa/s | dT/dt: %5.3f C/s | VOC: %.2f mol/m^3\n", simTime, dPdt, dTdt, voc);
+      Serial.println(">>> BATTERY LOAD DISCONNECTED. SYSTEM HALTED FOR SAFETY. <<<");
+      while(true) {
+        // Halt completely. Disconnect itself.
+        delay(1000);
+      }
       break;
   }
 
