@@ -88,7 +88,7 @@
       "attrs": { "color": "red", "label": "STATE 3: Critical Trip" }
     },
     {
-      "type": "wokwi-relay",
+      "type": "wokwi-relay-module",
       "id": "relay",
       "top": 50,
       "left": 550,

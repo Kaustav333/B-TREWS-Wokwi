@@ -62,14 +62,24 @@ struct COMSOL_Point {
   float voc_mol_m3;
 };
 
-// Representative Wokwi test vectors using project values
+// Representative Wokwi test vectors using project values (Expanded for 10s per state)
 COMSOL_Point comsol_profile[] = {
-  // { Time(s), Pressure(hPa), Temp(C), VOC (mol/m^3) }
-  { 0.0,  1013.25, 20.00, 0.00 }, // Initial conditions
-  { 5.0,  1013.25 + (0.041317 * 5), 20.00 + (0.041 * 5), 0.00 }, // NORMAL
-  { 10.0, 1013.45 + (0.19852 * 5),  20.20 + (0.200 * 5), 0.05 }, // CAUTION
-  { 15.0, 1014.45 + (0.69313 * 5),  21.20 + (0.408 * 5), 0.10 }, // WARNING
-  { 20.0, 1017.90 + (8.02120 * 5),  23.20 + (3.900 * 5), 1.00 }, // CRITICAL
+  // NORMAL (dPdt = ~0.04, dTdt = ~0.04)
+  { 0.0,  1013.250f, 20.000f, 0.00f },
+  { 5.0,  1013.450f, 20.200f, 0.00f },
+  { 10.0, 1013.650f, 20.400f, 0.00f },
+  
+  // CAUTION (dPdt = 0.20, dTdt = 0.20, VOC = 0.05)
+  { 15.0, 1014.650f, 21.400f, 0.05f },
+  { 20.0, 1015.650f, 22.400f, 0.05f },
+  
+  // WARNING (dPdt = 0.70, dTdt = 0.41, VOC = 0.10)
+  { 25.0, 1019.150f, 24.450f, 0.10f },
+  { 30.0, 1022.650f, 26.500f, 0.10f },
+  
+  // CRITICAL TRIP (dPdt = 2.60, dTdt = 1.30, VOC = 1.00)
+  { 35.0, 1035.650f, 33.000f, 1.00f },
+  { 40.0, 1048.650f, 39.500f, 1.00f }
 };
 const int comsol_length = sizeof(comsol_profile) / sizeof(comsol_profile[0]);
 
