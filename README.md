@@ -40,20 +40,23 @@ This repository contains the **Wokwi embedded simulation** of the B-TREWS system
 │  │  │  STATE 0: NORMAL                                     │  │   │
 │  │  │    → Green LED ON, Relay CLOSED, Load Active         │  │   │
 │  │  │                                                      │  │   │
-│  │  │  STATE 1: WARNING (VOC > 2500 OR dP/dt > 2.5 hPa/s) │  │   │
-│  │  │    → Amber LED ON, CAN Bus Warning Frame TX          │  │   │
+│  │  │  STATE 1: CAUTION                                    │  │   │
+│  │  │    → Yellow LED ON, Relay CLOSED                     │  │   │
 │  │  │                                                      │  │   │
-│  │  │  STATE 2: CRITICAL (dT/dt > 1.2°C/s OR T > 60°C)    │  │   │
+│  │  │  STATE 2: WARNING                                    │  │   │
+│  │  │    → Amber/Orange LED ON, CAN Bus Warning            │  │   │
+│  │  │                                                      │  │   │
+│  │  │  STATE 3: CRITICAL                                   │  │   │
 │  │  │    → Red LED ON, Buzzer ALARM, RELAY TRIPS (Load OFF)│  │   │
 │  │  └─────────────────────────────────────────────────────┘  │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │                    ACTUATION LAYER                               │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────────┐   │
-│  │ 🟢 Green │  │ 🟠 Amber │  │ 🔴 Red   │  │ 10A SSR Relay │   │
-│  │ LED      │  │ LED      │  │ LED      │  │ + Load Lamp   │   │
-│  │ (GPIO 13)│  │ (GPIO 14)│  │ (GPIO 21)│  │ (GPIO 48)     │   │
-│  └──────────┘  └──────────┘  └──────────┘  └───────────────┘   │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─────────┐ │
+│  │ 🟢 Green │ │ 🟡 Yellow│ │ 🟠 Amber │ │ 🔴 Red   │ │ 10A SSR │ │
+│  │ LED      │ │ LED      │ │ LED      │ │ LED      │ │ Relay   │ │
+│  │ (GPIO 13)│ │ (GPIO 12)│ │ (GPIO 14)│ │ (GPIO 21)│ │(GPIO 48)│ │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └─────────┘ │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -61,11 +64,14 @@ This repository contains the **Wokwi embedded simulation** of the B-TREWS system
 
 ## 📡 Sensor Specifications & Thresholds
 
-| Sensor | Physical Phenomenon | Detection Threshold | Response |
-|:---|:---|:---|:---|
-| **MQ-135 VOC Gas Sensor** | SEI decomposition: DEC/EMC volatile organic solvent venting (<2s latency) | `VOC ADC > 2500` | Escalates to **STATE 1 WARNING** |
-| **Bosch BMP280** | Micro-cavity convective pressure build-up above relief vent | `dP/dt > 2.5 hPa/s` | Sends CAN Warning Frame (`0x18FF0100`) |
-| **10k NTC Busbar Probe** | Exothermic thermal acceleration at negative terminal | `dT/dt > 1.2°C/s` OR `T > 60°C` | Escalates to **STATE 2 CRITICAL TRIP** |
+Based on the **Final Optimized COMSOL Reference Case** and project-matched triggers:
+
+| State | Wokwi Condition | Project Basis |
+|:---|:---|:---|
+| **NORMAL** | `dT/dt <= 0.041 C/s` AND `dP/dt <= 0.041317 hPa/s` AND `VOC < 0.05` | Matches mild thermal Case 1, lowest pressure-rate sweep reference, and no VOC arrival. |
+| **CAUTION** | `dT/dt > 0.041` and `< 0.408 C/s` OR `dP/dt > 0.041317` and `< 0.69313 hPa/s` OR `VOC >= 0.05` | Between mild and strong modeled behavior; VOC arrival detected. |
+| **WARNING** | `dT/dt >= 0.408` and `<= 1.2 C/s` OR `dP/dt >= 0.69313` and `< 2.5 hPa/s` | Anchored to thermal Case 2, final optimized dP/dt, and project critical limits. |
+| **CRITICAL** | `dT/dt > 1.2 C/s` OR `dP/dt >= 2.5 hPa/s` | Uses the actual project candidate critical triggers. |
 
 ---
 
@@ -75,10 +81,11 @@ The firmware includes a **COMSOL Multiphysics playback engine** that replays the
 
 ```cpp
 COMSOL_Point comsol_profile[] = {
-  // { Time(s), Pressure(hPa), Temp(°C), VOC_Gas(ADC) }
-  { 0.0,  1013.25, 25.0, 400  },  // Normal operation
-  { 20.0, 1018.80, 28.5, 2850 },  // STAGE 1: Off-gas spike -> WARNING
-  { 45.0, 1026.10, 62.4, 3950 },  // STAGE 2: Thermal trip -> RELAY DISCONNECT
+  // { Time(s), Pressure(hPa), Temp(C), VOC (mol/m^3) }
+  { 0.0,  1013.25, 20.00, 0.00 }, // NORMAL
+  { 10.0, 1014.44, 21.20, 0.05 }, // CAUTION
+  { 15.0, 1017.91, 23.24, 0.10 }, // WARNING
+  { 20.0, 1058.01, 42.70, 1.00 }, // CRITICAL TRIP
 };
 ```
 
@@ -99,8 +106,9 @@ COMSOL_Point comsol_profile[] = {
 | MQ-135 Gas Sensor | `wokwi-potentiometer` (analog sim) | VOC off-gas detection |
 | 10k NTC Thermistor | `wokwi-potentiometer` (analog sim) | Busbar temperature probe |
 | Green LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 0: Normal indicator |
-| Amber LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 1: Warning indicator |
-| Red LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 2: Critical Trip indicator |
+| Yellow LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 1: Caution indicator |
+| Amber LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 2: Warning indicator |
+| Red LED + 220Ω | `wokwi-led` + `wokwi-resistor` | STATE 3: Critical Trip indicator |
 | 10A Solid State Relay | `wokwi-relay` | Battery load disconnect switch |
 | Piezo Buzzer | `wokwi-buzzer` | Emergency audible alarm |
 | Blue LED + 220Ω | `wokwi-led` + `wokwi-resistor` | Battery pack load lamp |
@@ -143,16 +151,6 @@ COMSOL_Point comsol_profile[] = {
 3. Copy `src/main.cpp` content into the `sketch.ino` tab.
 4. Add libraries: `Adafruit BMP280 Library` and `Adafruit Unified Sensor`.
 5. Click **Play (▶️)**.
-
----
-
-## 🎬 Simulation Timeline
-
-| Time | State | Visual Output |
-|:---|:---|:---|
-| **0s – 15s** | STATE 0: Normal | 🟢 Green LED ON, Blue Load Lamp ON, Buzzer Silent |
-| **15s – 35s** | STATE 1: Warning | 🟠 Amber LED ON, CAN Warning Frames on Serial Monitor |
-| **35s onwards** | STATE 2: Critical Trip | 🔴 Red LED ON, Buzzer ALARM, Blue Lamp OFF (Relay Tripped) |
 
 ---
 
