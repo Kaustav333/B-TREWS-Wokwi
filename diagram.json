@@ -47,31 +47,45 @@
     },
     {
       "type": "wokwi-resistor",
-      "id": "r_amber",
+      "id": "r_yellow",
       "top": 560,
       "left": -400,
       "attrs": { "value": "220" }
     },
     {
       "type": "wokwi-led",
-      "id": "led_amber",
+      "id": "led_yellow",
       "top": 550,
       "left": -300,
-      "attrs": { "color": "orange", "label": "STATE 1: Warning" }
+      "attrs": { "color": "yellow", "label": "STATE 1: Caution" }
     },
     {
       "type": "wokwi-resistor",
-      "id": "r_red",
+      "id": "r_amber",
       "top": 690,
       "left": -400,
       "attrs": { "value": "220" }
     },
     {
       "type": "wokwi-led",
-      "id": "led_red",
+      "id": "led_amber",
       "top": 680,
       "left": -300,
-      "attrs": { "color": "red", "label": "STATE 2: Critical Trip" }
+      "attrs": { "color": "orange", "label": "STATE 2: Warning" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_red",
+      "top": 820,
+      "left": -400,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 810,
+      "left": -300,
+      "attrs": { "color": "red", "label": "STATE 3: Critical Trip" }
     },
     {
       "type": "wokwi-relay",
@@ -119,6 +133,10 @@
     [ "esp:13", "r_green:1", "green", [ "v0" ] ],
     [ "r_green:2", "led_green:A", "green", [ "h0" ] ],
     [ "led_green:C", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:12", "r_yellow:1", "yellow", [ "v0" ] ],
+    [ "r_yellow:2", "led_yellow:A", "yellow", [ "h0" ] ],
+    [ "led_yellow:C", "esp:GND.1", "black", [ "v0" ] ],
 
     [ "esp:14", "r_amber:1", "orange", [ "v0" ] ],
     [ "r_amber:2", "led_amber:A", "orange", [ "h0" ] ],
