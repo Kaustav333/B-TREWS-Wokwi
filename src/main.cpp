@@ -24,7 +24,7 @@
 #define PIN_VOC_ADC    7    // MQ-135 VOC Gas Sensor (ADC)
 #define PIN_NTC_ADC    8    // NTC Busbar Temp Probe (ADC)
 #define PIN_LED_GREEN  13   // State 0: Normal
-#define PIN_LED_YELLOW 12   // State 1: Caution
+#define PIN_LED_YELLOW 10   // State 1: Caution
 #define PIN_LED_AMBER  14   // State 2: Warning
 #define PIN_LED_RED    21   // State 3: Critical Trip
 #define PIN_BUZZER     47   // Emergency Alarm Buzzer

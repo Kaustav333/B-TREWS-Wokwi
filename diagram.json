@@ -134,7 +134,7 @@
     [ "r_green:2", "led_green:A", "green", [ "h0" ] ],
     [ "led_green:C", "esp:GND.1", "black", [ "v0" ] ],
 
-    [ "esp:12", "r_yellow:1", "yellow", [ "v0" ] ],
+    [ "esp:10", "r_yellow:1", "yellow", [ "v0" ] ],
     [ "r_yellow:2", "led_yellow:A", "yellow", [ "h0" ] ],
     [ "led_yellow:C", "esp:GND.1", "black", [ "v0" ] ],
 
